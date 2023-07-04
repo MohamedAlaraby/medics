@@ -1,24 +1,29 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medics/layout/cubit/states.dart';
+import 'package:medics/models/get_vests.dart';
+import 'package:medics/models/oxy_flow_model.dart';
+import 'package:medics/models/sensors_readings_model.dart';
 import 'package:medics/models/user_model.dart';
-import 'package:medics/models/users_model.dart';
 import 'package:medics/modules/prediction/prediction_screen.dart';
-import 'package:medics/modules/screen2/screen2.dart';
+import 'package:medics/modules/sensors_readings/DisplayReading.dart';
 import 'package:medics/modules/settings/settings_screen.dart';
-import 'package:medics/screen3/screen3.dart';
 import 'package:medics/shared/constants.dart';
 import 'package:medics/shared/network/endpoints.dart';
 import 'package:medics/shared/network/remote/dio_helper.dart';
+import '../../modules/show_ecg_data/show_ecg_screen.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+
 
 class DashboardCubit extends Cubit<DashboardStates>{
   DashboardCubit():super(DashboardInitialState());
   static DashboardCubit get(context) => BlocProvider.of(context);
   int currentIndex = 0;
   List<Widget> screens = [
-        const PredictionScreen(),
-        const Screen2(),
-        const Screen3(),
+         DisplayReading(),
+         DrawECGData(),
+         PredictionScreen(),
          SettingsScreen(),
   ];
 
@@ -29,64 +34,109 @@ class DashboardCubit extends Cubit<DashboardStates>{
 
   UserModel? userModel;
   void getUserData(){
-    emit(DashboardLoadingGetUserDataState());
+    emit(DashboardLoadingGetProfileState());
 
     DioHelper.getData(
-      url: SHOW,
-      token: token
+        url: SHOW,
+        token: token
     ).then((value) {
       userModel = UserModel.fromJson(value.data);
-      emit(DashboardSuccessGetUserDataState());
+      emit(DashboardSuccessGetProfileState());
       print('elaraby user details are:::${value.data}');
 
 
     }).catchError((error) {
-      emit(DashboardErrorGetUserDataState());
-      print("elaraby error when getting the user data  is ::::${error.toString()}");
-    });
-  }
-  UsersModel? users;
-  void getUsers(){
-    emit(DashboardLoadingGetUserDataState());
-
-    DioHelper.getData(
-        url: SHOW_ALL,
-        token: token
-    ).then((value) {
-      users = UsersModel.fromJson(value.data);
-      emit(DashboardSuccessGetUserDataState());
-      print('elaraby users are:::${value.data}');
-
-    }).catchError((error) {
-      emit(DashboardErrorGetUserDataState());
-      print("elaraby error when getting the user data  is ::::${error.toString()}");
+      emit(DashboardErrorGetProfileState());
+      print("elaraby error when getting the user data  is :${error.toString()}");
     });
   }
 
-  void updateUserData({
+
+
+
+
+
+  void updateProfile({
     required String name,
-    required String email,
     required String phone,
+    required String age,
+    required String gender,
   }){
-    emit(DashboardLoadingUpdateUserDataState());
-    DioHelper.updateData(
+    emit(DashboardLoadingUpdateProfileState());
+    DioHelper.postData(
       url: UPDATE,
       token:token,
       data: {
         'name':name,
-        'email':email ,
-        'phone':phone
+        'phone':phone ,
+        'age':age,
+        'gender':gender,
       },
-    ) .then((value) {
+    ).then((value) {
       userModel = UserModel.fromJson(value.data);
 
-      emit(DashboardSuccessUpdateUserDataState());
-      print('elaraby UpdateUser success details are:::${value.data}');
+      emit(DashboardSuccessUpdateProfileState());
+      print('update User success details are:::${value.data}');
     }).catchError((error) {
-      emit(DashboardErrorUpdateUserDataState());
-      print("elaraby error when getting the UpdateUser data  is ::::${error.toString()}");
+      emit(DashboardErrorUpdateProfileState());
+      print("error when Update User data is ${error.toString()}");
     });
   }
+
+
+  SensorsReadingsModel? getReadingsModel;
+  void getAllSensorsReadings({
+    required String vest_id,
+  }){
+    emit(DashboardLoadingGetAllSensorsReadingsState());
+    DioHelper.postData(
+      url: SHOW_ALL_READINGS,
+      token:token,
+      data: {
+        'vest_id':vest_id,
+      },
+    ) .then((value) {
+      getReadingsModel = SensorsReadingsModel.fromJson(value.data);
+
+      emit(DashboardSuccessGetAllSensorsReadingsState());
+      print('get all sensors data success details are:::${value.data}');
+    }).catchError((error) {
+      emit(DashboardErrorGetAllSensorsReadingsState());
+      print("error when Update User data is ${error.toString()}");
+    });
+  }
+  //ai functions
+  OxyFlowModel? oxyFlowModel;
+
+
+  void getPredictedOxyFlow( {
+      required String? heart_rate,
+      required String? gender,
+      required String? age,
+      required String? spo2,
+   } ){
+    emit(DashboardLoadingPredictState());
+    DioHelper.postDataPred(
+      url: PREDICT,
+      data: {
+        "pr":heart_rate,
+        "gender":gender,
+        "age":age,
+        "nCoV2":"1",
+        "spo2":spo2,
+      },
+    ) .then((value) {
+      oxyFlowModel = OxyFlowModel.fromJson(value.data);
+
+      emit(DashboardSuccessPredictState());
+      print('prediction success details are:::${value.data}');
+    }).catchError((error) {
+      emit(DashboardErrorPredictState());
+      print("error when prediction is ${error.toString()}");
+    });
+  }
+
+
 
 }
 

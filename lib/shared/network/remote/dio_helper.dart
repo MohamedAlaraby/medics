@@ -1,11 +1,22 @@
 import 'package:dio/dio.dart';
+import 'package:medics/shared/constants.dart';
 class DioHelper{
   static late Dio dio;
+  static late Dio PredictionDio;
   static init(){
     dio=Dio(
       BaseOptions(
           baseUrl: 'https://test.saloni.ma/api/',
-          receiveDataWhenStatusError: true,
+          receiveDataWhenStatusError: true,//receive response data even when the HTTP status code indicates an error.
+      ),
+
+    );
+
+
+    PredictionDio=Dio(
+      BaseOptions(
+        baseUrl: 'https://flask-production-ecba.up.railway.app/',
+        receiveDataWhenStatusError: true,
       ),
     );
   }
@@ -36,17 +47,30 @@ class DioHelper{
     String? lang='en',
     String? token,
   })async{
-    dio.options.headers={
+    dio.options.headers = {
       'lang':lang,
-      'Authorization':token,
+      'Authorization':'Bearer ${token}',
       'Content-Type':'application/json',
+
     };
     return await dio.post(
-        url,
+        url,//your endpoint
         data:data
     );
   }
 
+
+
+  static Future<Response> postDataPred({
+    required String url,
+    required dynamic data,
+  }) async{
+
+    return await PredictionDio.post(
+        url,
+        data:data
+    );
+  }
 
   static Future<Response> updateData({
     required String url,
@@ -58,7 +82,7 @@ class DioHelper{
 
     dio.options.headers={
       'lang':lang,
-      'Authorization':token,
+      'Authorization':'Bearer ${token}',
       'Content-Type':'application/json',
     };
     return await dio.put(

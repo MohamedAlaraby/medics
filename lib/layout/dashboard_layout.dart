@@ -9,28 +9,33 @@ class DashboardLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider( create: (context) => DashboardCubit()..getUserData(),
 
+    return BlocProvider(
+      create: (context) => DashboardCubit()..getUserData()..getAllSensorsReadings(vest_id: vest_id!),
       child:BlocConsumer<DashboardCubit,DashboardStates>(
       listener: (context, state) { },
       builder:  (context, state) {
+
         var cubit=DashboardCubit.get(context);
-        return Scaffold(
-          appBar:AppBar (
-            title:const Text('Medics'),
-          ),
-          body:cubit.screens[cubit.currentIndex],
-          bottomNavigationBar: BottomNavigationBar(
-              items:const [
-                 BottomNavigationBarItem(icon:Icon(Icons.home),label:      'Prediction'),
-                 BottomNavigationBarItem(icon:Icon(Icons.apps),label:      'Screen2'),
-                 BottomNavigationBarItem(icon:Icon(Icons.favorite),label:  'Screen3'),
-                 BottomNavigationBarItem(icon:Icon(Icons.settings),label:  'Settings'),
-              ],
-              onTap:(index) {
-                cubit.changeBottom(index);
-              },
-              currentIndex:cubit.currentIndex,
+
+        return SafeArea(
+          child: Scaffold(
+            appBar:AppBar (
+              title:const Text('Medics',style: TextStyle(color: Colors.white)),
+            ),
+            body:cubit.screens[cubit.currentIndex],
+            bottomNavigationBar: BottomNavigationBar(
+                items:const [
+                   BottomNavigationBarItem(icon:Icon(Icons.home),label:  'Readings'),
+                   BottomNavigationBarItem(icon:Icon(Icons.data_thresholding),label:'ECG'),
+                   BottomNavigationBarItem(icon:Icon(Icons.online_prediction),label:'Prediction'),
+                   BottomNavigationBarItem(icon:Icon(Icons.settings),label:  'Settings'),
+                ],
+                onTap:(index) {
+                  cubit.changeBottom(index);
+                },
+                currentIndex:cubit.currentIndex,
+            ),
           ),
         );
       },

@@ -1,26 +1,42 @@
 class UserModel {
   User? user;
   String? token;
+
+  UserModel({this.user, this.token});
+
   UserModel.fromJson(Map<String, dynamic> json) {
-    user = json['user'] != null ? User.fromJson(json['user']) : null;
+    user = json['user'] != null ?  User.fromJson(json['user']) : null;
     token = json['token'];
   }
+
+
 }
 
 class User {
-  String? name;
-  String? email;
-  String? phone;
-  String? updatedAt;
-  String? createdAt;
   int? id;
+  String? name;
+  String? age;
+  String? phone;
+  String? gender;
+  String? email;
+  String? emailVerifiedAt;
+  String? type;
+  String? vestId;
+  String? createdAt;
+  String? updatedAt;
 
   User.fromJson(Map<String, dynamic> json) {
+    id =  json['id'];
     name = json['name'];
-    email = json['email'];
+    age =  json['age'];
     phone = json['phone'];
-    updatedAt = json['updated_at'];
+    gender = json['gender'];
+    email = json['email'];
+    emailVerifiedAt = json['email_verified_at'];
+    type = json['type'];
+    vestId = json['vest_id'];
     createdAt = json['created_at'];
-    id = json['id'];
+    updatedAt = json['updated_at'];
   }
 }
+

@@ -12,14 +12,14 @@ class LoginCubit extends Cubit<LoginStates> {
   UserModel? userModel;
   void loginUser({
     required String email,
-    required String password
+    required String password,
   }) {
     emit(LoginLoadingState());
     DioHelper.postData(
       url:LOGIN,
       data:{
         'email':email,
-        'password':password
+        'password':password,
       },
     ).then((value){
        print(value.data);

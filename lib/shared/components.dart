@@ -1,5 +1,3 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:medics/shared/colors.dart';
@@ -26,23 +24,32 @@ Widget DefaultTextFormField({
     Function(String string)? onChange,
     Function()? onTap,
     bool isClickable = true,
-    bool isPassword =  false, //the default is to hide the password.
+    bool isPassword =  false,//the default is to hide the password.
+
 }) {
     return TextFormField(
         validator: validator,
         controller: controller,
         obscureText: isPassword,//do you want to show the password or not.
+        style:TextStyle(color: Colors.white) ,
         decoration: InputDecoration(
             labelText: label,
-            prefixIcon: Icon(prefix),
+            prefixIcon: Icon(
+                prefix,
+              color: Colors.white,
+            ),
             suffixIcon: suffix ?? null,
             border:const OutlineInputBorder(),
+            labelStyle: TextStyle(
+              color: Colors.white
+            )
         ),
         keyboardType: textInputType,
         onFieldSubmitted: onFieldSubmitted,
         onChanged: onChange,
         onTap: onTap,
         enabled: isClickable,
+
     );
 }
 Widget DefaultButton({
@@ -54,9 +61,10 @@ Color backgroundColor=defaultColor,
 // you can replace the void Function() by VoidCallback
 required final void Function() function,
 required String text,
-double radius=5.0
+double radius=5.0,
 })=>Container(
     width: width,
+    padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
     child: Container(
         decoration: BoxDecoration(
             color: backgroundColor,
